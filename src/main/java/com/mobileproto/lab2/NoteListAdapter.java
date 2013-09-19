@@ -18,6 +18,7 @@ public class NoteListAdapter extends ArrayAdapter {
 
     private List<String> data;
     private Activity activity;
+    private DatabaseHandler db;
 
     public NoteListAdapter(Activity a, int viewResourceId, List<String> data){
         super(a, viewResourceId, data);
@@ -36,12 +37,13 @@ public class NoteListAdapter extends ArrayAdapter {
         ImageButton del = (ImageButton) v.findViewById(R.id.deleteButton);
         final TextView name = (TextView) v.findViewById(R.id.titleTextView);
         name.setText(data.get(position));
+        db = new DatabaseHandler(activity.getApplicationContext());
 
         del.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String fileName = name.getText().toString();
-                activity.deleteFile(fileName);
+                String noteName = name.getText().toString();
+                db.deleteNote(noteName);
                 data.remove(position);
                 NoteListAdapter.this.notifyDataSetChanged();
             }

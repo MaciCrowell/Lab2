@@ -20,31 +20,18 @@ public class NoteDetailActivity extends Activity {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_detail);
-
+        DatabaseHandler db = new DatabaseHandler(getApplicationContext());
         Intent intent = getIntent();
 
-        String fileName = intent.getStringExtra("file");
+        String noteName = intent.getStringExtra("note");
 
         TextView title = (TextView) findViewById(R.id.noteTitle);
         TextView noteText = (TextView) findViewById(R.id.noteText);
 
-        title.setText(fileName);
-        StringBuilder fileText = new StringBuilder();
-        try{
-            FileInputStream fis = openFileInput(fileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fis);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null){
-                fileText.append(line);
-                fileText.append('\n');
-            }
+        title.setText(noteName);
+        String text = db.getNoteText(noteName);
 
-        }catch (IOException e){
-            Log.e("IOException", e.getMessage());
-        }
-
-        noteText.setText(fileText.toString());
+        noteText.setText(text); //db.getNote(noteName).getNoteText()
 
     }
 }

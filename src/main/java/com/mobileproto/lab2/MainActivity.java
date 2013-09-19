@@ -19,19 +19,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends Activity {
+    public DatabaseHandler db = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final DatabaseHandler db = new DatabaseHandler(this);
 
         final TextView title = (TextView) findViewById(R.id.titleField);
-
-
         final TextView note = (TextView) findViewById(R.id.noteField);
-
-
-        List<String> files = new ArrayList<String>(Arrays.asList(fileList()));
+        List<String> files = db.getNoteNames();
 
         final NoteListAdapter aa = new NoteListAdapter(this, android.R.layout.simple_list_item_1, files);
 
@@ -39,27 +37,21 @@ public class MainActivity extends Activity {
 
         notes.setAdapter(aa);
 
-
-
         Button save = (Button)findViewById(R.id.saveButton);
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String fileName = title.getText().toString();
+                String noteName = title.getText().toString();
                 String noteText = note.getText().toString();
-                if (fileName != null && noteText != null){
-                    try{
-                        FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-                        fos.write(noteText.getBytes());
-                        fos.close();
-                        title.setText("");
-                        note.setText("");
-                        aa.insert(fileName,0);
-                        aa.notifyDataSetChanged();
-                    }catch (IOException e){
-                        Log.e("IOException", e.getMessage());
-                    }
+                if (noteName != null && noteText != null){
+
+                    db.addNote(new Note(noteName, noteText));
+                    title.setText("");
+                    note.setText("");
+                    aa.insert(noteName,0);
+                    aa.notifyDataSetChanged();
+
                 }
             }
         });
@@ -70,9 +62,9 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final TextView title = (TextView) view.findViewById(R.id.titleTextView);
-                String fileName = title.getText().toString();
+                String noteName = title.getText().toString();
                 Intent in = new Intent(getApplicationContext(), NoteDetailActivity.class);
-                in.putExtra("file", fileName);
+                in.putExtra("note", noteName);
                 startActivity(in);
             }
         });
@@ -86,5 +78,5 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-    
+
 }
